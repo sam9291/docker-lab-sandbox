@@ -1,0 +1,21 @@
+version: "2"
+services:
+  # back-ends
+  zipkin:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.82.0
+    restart: unless-stopped
+    command: ['--config=/etc/otel-collector-config.yaml']
+    volumes:
+      - ./configs/otel-collector.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - '4318:4318' #OTLP receiver
+      - '4317:4317' #OTLP receiver GRPC
+      - '13133:13133' #health_check extension
+    depends_on:
+      - zipkin

@@ -1,0 +1,65 @@
+version: "3"
+services:      
+  opensearch-node1:
+    image: opensearchproject/opensearch:2.9.0
+    restart: unless-stopped
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+      - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - lab_opensearch-data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600 # required for Performance Analyzer
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.9.0
+    restart: unless-stopped
+    hostname: "opensearch-dashboard"
+    ports:
+      - 5601:5601
+    expose:
+      - "5601"
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://opensearch-node1:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
+
+  data-prepper:
+    platform: linux/amd64
+    container_name: data-prepper
+    image: opensearchproject/data-prepper:2.3.2
+    restart: unless-stopped
+    links:
+      - opensearch-node1
+    ports:
+      - 4900:4900
+      - 2021:2021
+      - 21890:21890
+    volumes:
+      - ./configs/data-prepper-pipelines.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.82.0
+    restart: unless-stopped
+    command: ['--config=/etc/otel-collector-config.yaml']
+    volumes:
+      - ./configs/otel-collector.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - '4318:4318' #OTLP receiver
+      - '4317:4317' #OTLP receiver GRPC
+      - '13133:13133' #health_check extension
+
+volumes:
+  lab_opensearch-data:

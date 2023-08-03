@@ -1,0 +1,51 @@
+extensions:
+  health_check:
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+
+exporters:
+  otlp/data-prepper-traces:
+    endpoint: data-prepper:21890
+    tls:
+      insecure: true  
+  otlp/data-prepper-metrics:
+    endpoint: data-prepper:21891
+    tls:
+      insecure: true  
+  otlp/data-prepper-logs:
+    endpoint: data-prepper:21892
+    tls:
+      insecure: true
+  logging/debug:
+    loglevel: debug
+  logging:
+    loglevel: error
+
+processors:
+  batch:
+
+  
+service:
+  extensions: [health_check]
+  pipelines:
+    traces/cloud:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/data-prepper-traces, logging]
+    traces/onprem:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/data-prepper-traces, logging]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/data-prepper-metrics, logging]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/data-prepper-logs, logging/debug]
