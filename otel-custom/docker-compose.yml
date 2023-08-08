@@ -1,0 +1,10 @@
+version: "3"
+services:
+  otel-collector:
+    image: custom-otel-collector
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml
+    ports:
+      - '4318:4318' #OTLP receiver
+      - '4317:4317' #OTLP receiver GRPC
+      - '13133:13133' #health_check extension
