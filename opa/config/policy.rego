@@ -1,10 +1,17 @@
 package policy
 
-allow[result] {
-    input.action.id == "HR"
-    result = "allow HR"
+import future.keywords.if
+
+default policy_allow := false
+
+# Add white list app
+policy_allow if {
+    input.app.name == "test"
+    input.app.environment == "dev"
 }
-allow[result] {
-    input.action.name == "employee"
-    result = "allow employee"
+
+# Add with version to be calculated
+policy_allow if {
+    input.app.name == "test"
+    input.app.version == "1.0.0"
 }
