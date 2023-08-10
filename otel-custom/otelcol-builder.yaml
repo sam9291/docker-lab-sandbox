@@ -2,7 +2,7 @@ dist:
   module: github.com/open-telemetry/opentelemetry-collector
   name: otelcol
   description: Custom OpenTelemetry collector
-  output_path: ./output
+  output_path: /output
   otelcol_version: 0.82.0
   debug_compilation: false
 extensions:
