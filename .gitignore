@@ -2,3 +2,5 @@
 *.tar.gz
 
 otel-custom/output
+structurizr/workspace/.structurizr
+structurizr/workspace/workspace.json
