@@ -2,5 +2,10 @@
 *.tar.gz
 
 otel-custom/output
-structurizr/workspace/.structurizr
-structurizr/workspace/workspace.json
+structurizr-lite/workspace/.structurizr
+structurizr-lite/workspace/workspace.json
+structurizr-onpremises/workspace/.structurizr
+structurizr-onpremises/workspace/workspace.json
+structurizr-onpremises/workspace/logs
+structurizr-onpremises/workspace/index
+structurizr-onpremises/workspace/1
