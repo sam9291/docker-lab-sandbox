@@ -6,3 +6,8 @@ services:
     - ./workspace:/usr/local/structurizr
     ports:
         - 8080:8080
+  cli:
+    image: structurizr/cli:latest
+    command: list -w /usr/local/structurizr/workspace.dsl
+    volumes:
+    - ./workspace:/usr/local/structurizr
